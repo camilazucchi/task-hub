@@ -7,5 +7,9 @@ public class ClientTaskHub {
 
         Socket socket = new Socket("localhost", 12345);
 
+        System.out.println("Conexão estabelecida com sucesso!");
+
+        socket.close();
+
     }
 }
