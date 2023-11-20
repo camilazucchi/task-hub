@@ -13,6 +13,10 @@ public class TaskHub {
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Aceitando novo cliente " + socket.getPort());
+
+                TaskDistributor taskDistributor = new TaskDistributor(socket);
+                Thread threadClient = new Thread(taskDistributor);
+                threadClient.start();
             }
         } catch (IOException exception) {
             System.err.println("Erro ao lidar com o servidor: " + exception.getMessage());
