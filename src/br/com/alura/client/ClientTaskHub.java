@@ -1,5 +1,6 @@
 package br.com.alura.client;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
@@ -12,16 +13,47 @@ public class ClientTaskHub {
 
         System.out.println("Conexão estabelecida com sucesso!");
 
-        PrintStream stream = new PrintStream(socket.getOutputStream());
-        stream.println("C1");
+        // Tarefa para enviar os comandos:
+        Thread sendCommandThread = new Thread(() -> {
+            try {
+                System.out.println("Envie seus comandos: ");
+                PrintStream printStream = new PrintStream(socket.getOutputStream());
+                Scanner scanner = new Scanner(System.in);
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
 
-        Scanner scanner = new Scanner(System.in);
+                    if (line.isEmpty()) {
+                        break;
+                    }
+                    printStream.println(line);
+                }
+                printStream.close();
+                scanner.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
-        scanner.nextLine();
+        // Tarefa para receber os dados:
+        Thread receiveResponseThread = new Thread(() -> {
+            try {
+                System.out.println("Recebendo dados do servidor...");
+                Scanner serverResponse = new Scanner(socket.getInputStream());
+                while (serverResponse.hasNextLine()) {
+                    String line = serverResponse.nextLine();
+                    System.out.println(line);
+                }
+                serverResponse.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
-        stream.close();
-        scanner.close();
+        receiveResponseThread.start();
+        sendCommandThread.start();
+        sendCommandThread.join();
+
+        System.out.println("Fechando o socket do cliente...");
         socket.close();
-
     }
 }
