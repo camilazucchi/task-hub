@@ -13,7 +13,9 @@ public class ClientTaskHub {
 
         System.out.println("Conexão estabelecida com sucesso!");
 
+        // Separamos as tarefas do lado do cliente:
         // Tarefa para enviar os comandos:
+        // Aqui utilizei lambda para o código de Thread, sem o Runnable explicitamente:
         Thread sendCommandThread = new Thread(() -> {
             try {
                 System.out.println("Envie seus comandos: ");
@@ -51,6 +53,8 @@ public class ClientTaskHub {
 
         receiveResponseThread.start();
         sendCommandThread.start();
+        // Faz com que a thread que executa essa linha fique esperando (no nosso caso, main).
+        // Só voltas a ser executada quando "sendCommandThread" terminar.
         sendCommandThread.join();
 
         System.out.println("Fechando o socket do cliente...");
