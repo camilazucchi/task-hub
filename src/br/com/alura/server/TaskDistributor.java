@@ -42,7 +42,7 @@ public class TaskDistributor implements Runnable {
                             break;
                         case "c2":
                             clientOutput.println("O comando C2 foi enviado!");
-                            CommandC2 c2 = new CommandC2(clientOutput);
+                            C2WebServiceCaller c2 = new C2WebServiceCaller(clientOutput);
                             this.executorService.execute(c2);
                             clientOutput.flush();
                             break;
