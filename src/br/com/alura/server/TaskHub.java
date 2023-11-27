@@ -16,7 +16,7 @@ public class TaskHub {
     public TaskHub() throws IOException {
         System.out.println("Servidor esperando por conexões...");
         this.serverSocket = new ServerSocket(12345);
-        this.executorService = Executors.newCachedThreadPool();
+        this.executorService = Executors.newFixedThreadPool(4, new CustomThreadFactory());
         this.isRunning = new AtomicBoolean(true);
     }
 
