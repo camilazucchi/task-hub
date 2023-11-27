@@ -3,13 +3,16 @@ package br.com.alura.server;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
 
 public class TaskDistributor implements Runnable {
     private static final Object lock = new Object();
+    private final ExecutorService executorService;
     private Socket socket;
     private TaskHub server;
 
-    public TaskDistributor(Socket socket, TaskHub server) {
+    public TaskDistributor(ExecutorService executorService, Socket socket, TaskHub server) {
+        this.executorService = executorService;
         this.socket = socket;
         this.server = server;
     }
@@ -33,10 +36,14 @@ public class TaskDistributor implements Runnable {
                     switch (command) {
                         case "c1":
                             clientOutput.println("O comando C1 foi enviado!");
+                            CommandC1 c1 = new CommandC1(clientOutput);
+                            this.executorService.execute(c1);
                             clientOutput.flush();
                             break;
                         case "c2":
                             clientOutput.println("O comando C2 foi enviado!");
+                            CommandC2 c2 = new CommandC2(clientOutput);
+                            this.executorService.execute(c2);
                             clientOutput.flush();
                             break;
                         case "fim":
