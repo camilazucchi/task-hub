@@ -4,12 +4,13 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 public class TaskDistributor implements Runnable {
     private static final Object lock = new Object();
     private final ExecutorService executorService;
-    private Socket socket;
-    private TaskHub server;
+    private final Socket socket;
+    private final TaskHub server;
 
     public TaskDistributor(ExecutorService executorService, Socket socket, TaskHub server) {
         this.executorService = executorService;
@@ -42,9 +43,14 @@ public class TaskDistributor implements Runnable {
                             break;
                         case "c2":
                             clientOutput.println("O comando C2 foi enviado!");
-                            C2WebServiceCaller c2 = new C2WebServiceCaller(clientOutput);
-                            this.executorService.execute(c2);
+                            C2WebServiceCaller c2WebServiceCaller = new C2WebServiceCaller(clientOutput);
+                            C2DatabaseAcessor c2DatabaseAcessor = new C2DatabaseAcessor(clientOutput);
+                            Future<String> futureWebServiceCaller = this.executorService.submit(c2WebServiceCaller);
+                            Future<String> futureDatabaseAcessor = this.executorService.submit(c2DatabaseAcessor);
                             clientOutput.flush();
+
+                            this.executorService.submit(new MergeResultsFutureBankWs(futureWebServiceCaller, futureDatabaseAcessor, clientOutput));
+
                             break;
                         case "fim":
                             clientOutput.println("Encerrando o servidor...");
